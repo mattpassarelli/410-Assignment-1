@@ -8,7 +8,6 @@
 
 main()
 {
-	int rtn = 0;
-	return rtn;
+	return 0;
 }
 
