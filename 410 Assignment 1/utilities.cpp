@@ -25,8 +25,6 @@ int loadData(const char* filename) {
 	std::ifstream inFile;
 	std::string line;
 	std::string token;
-	process_stats stats;
-	int count = 0;
 	const char CHAR_TO_SEARCH_FOR = ',';
 
 	inFile.open(filename);
@@ -34,23 +32,31 @@ int loadData(const char* filename) {
 
 	if (inFile.is_open()) {
 
-		while(!inFile.eof())
-		{
+		while (!inFile.eof()) {
+			int count = 0;
+			process_stats stats;
+
 			getline(inFile, line);
-			if(!line.empty())
-			{
+			while (!line.empty()) {
+
 				std::istringstream ss(line);
-				if(!getline(ss, line, CHAR_TO_SEARCH_FOR))
-				{
+
+				if (!getline(ss, line, CHAR_TO_SEARCH_FOR)) {
 					break;
 				}
 
-				if(count == 0)
+				switch(count)
+				{
+				case 0:
 					stats.process_number = std::stoi(line);
-				else if(count == 1)
+					break;
+				case 1:
 					stats.start_time = std::stoi(line);
-				else if(count == 2)
+					break;
+				case 2:
 					stats.cpu_time = std::stoi(line);
+					break;
+				}
 
 				count++;
 			}
@@ -72,7 +78,33 @@ int loadData(const char* filename) {
 //if the file exists, overwrite its contents.
 //returns SUCCESS if all goes well or COULD_NOT_OPEN_FILE
 int saveData(const char* filename) {
-	return 0;
+	std::ofstream outFile;
+
+	outFile.open(filename);
+
+	if(outFile.is_open())
+	{
+		std::string data;
+		process_stats temp;
+
+		for(int i = 0; i < list.size(); i++)
+		{
+
+			//TODO assign removed index to temp
+			temp = list.pop_back();
+			data = temp.process_number + "," + temp.start_time + "," + temp.cpu_time;
+
+			outFile << data << std::endl;
+		}
+
+		outFile.close();
+		return SUCCESS;
+	}
+	else
+	{
+		return COULD_NOT_OPEN_FILE;
+	}
+
 }
 
 //sorts the vector, returns nothing (thats what void means)
@@ -84,5 +116,11 @@ void sortData(SORT_ORDER mySortOrder) {
 //return the first struct in the vector
 //then deletes it from the vector
 process_stats getNext() {
+	process_stats rtn;
 
+	rtn = list.front();
+
+	//TODO remove the index
+
+	return rtn;
 }
