@@ -25,7 +25,6 @@ int loadData(const char* filename) {
 	std::ifstream inFile;
 	std::string line;
 	std::string token;
-	const char CHAR_TO_SEARCH_FOR = ',';
 
 	inFile.open(filename);
 	inFile.clear();
@@ -80,6 +79,8 @@ int loadData(const char* filename) {
 int saveData(const char* filename) {
 	std::ofstream outFile;
 
+	std::vector<process_stats>::iterator ptr;
+
 	outFile.open(filename);
 
 	if(outFile.is_open())
@@ -87,15 +88,14 @@ int saveData(const char* filename) {
 		std::string data;
 		process_stats temp;
 
-		for(int i = 0; i < list.size(); i++)
-		{
+		for(ptr = list.begin(); ptr < list.end(); ptr++)
+			{
+				temp = *ptr;
 
-			//TODO assign removed index to temp
-			temp = list.pop_back();
-			data = temp.process_number + "," + temp.start_time + "," + temp.cpu_time;
+				data = temp.process_number + ',' + temp.start_time + ',' + temp.cpu_time;
 
-			outFile << data << std::endl;
-		}
+				outFile << data << std::endl;
+			}
 
 		outFile.close();
 		return SUCCESS;
@@ -107,10 +107,32 @@ int saveData(const char* filename) {
 
 }
 
+
+
+int sort(SORT_ORDER mySortOrder)
+{
+	switch(mySortOrder)
+		{
+		case SORT_ORDER::CPU_TIME:
+			return 1;
+		case SORT_ORDER::PROCESS_NUMBER:
+			return 2;
+		case SORT_ORDER::START_TIME:
+			return 3;
+		default:
+			return FAIL;
+		}
+}
+
 //sorts the vector, returns nothing (thats what void means)
 //sorts low to high
 void sortData(SORT_ORDER mySortOrder) {
+	sort(mySortOrder);
+}
 
+bool operator<(SORT_ORDER left, SORT_ORDER right)
+{
+	return sort(left) < sort(right);
 }
 
 //return the first struct in the vector
@@ -120,7 +142,7 @@ process_stats getNext() {
 
 	rtn = list.front();
 
-	//TODO remove the index
+	list.erase(list.begin());
 
 	return rtn;
 }
