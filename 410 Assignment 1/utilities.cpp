@@ -25,6 +25,7 @@ int loadData(const char* filename) {
 	std::ifstream inFile;
 	std::string line;
 	std::string token;
+	std::stringstream ss;
 
 	inFile.open(filename);
 	inFile.clear();
@@ -32,37 +33,30 @@ int loadData(const char* filename) {
 	if (inFile.is_open()) {
 
 		while (!inFile.eof()) {
-			int count = 0;
+
 			process_stats stats;
 
-			getline(inFile, line);
-			while (!line.empty()) {
+			while (getline(inFile, line)) {
 
-				std::istringstream ss(line);
+				ss.str(line);
+				std::string tempValue;
 
-				if (!getline(ss, line, CHAR_TO_SEARCH_FOR)) {
-					break;
-				}
+				getline(ss, tempValue, CHAR_TO_SEARCH_FOR);
+				stats.process_number = std::stoi(tempValue);
 
-				switch(count)
-				{
-				case 0:
-					stats.process_number = std::stoi(line);
-					break;
-				case 1:
-					stats.start_time = std::stoi(line);
-					break;
-				case 2:
-					stats.cpu_time = std::stoi(line);
-					break;
-				}
+				getline(ss, tempValue, CHAR_TO_SEARCH_FOR);
+				stats.start_time = std::stoi(tempValue);
 
-				count++;
+				getline(ss, tempValue, CHAR_TO_SEARCH_FOR);
+				stats.cpu_time = std::stoi(tempValue);
+
+				list.push_back(stats);
+				ss.clear();
 			}
 
-			list.push_back(stats);
 		}
 
+		inFile.close();
 		return SUCCESS;
 
 	} else {
@@ -83,45 +77,39 @@ int saveData(const char* filename) {
 
 	outFile.open(filename);
 
-	if(outFile.is_open())
-	{
+	if (outFile.is_open()) {
 		std::string data;
 		process_stats temp;
 
-		for(ptr = list.begin(); ptr < list.end(); ptr++)
-			{
-				temp = *ptr;
+		for (unsigned int i = 0; i < list.size(); i++) {
+			temp = list[i];
 
-				data = temp.process_number + ',' + temp.start_time + ',' + temp.cpu_time;
+			data = std::to_string(temp.process_number) + ","
+					+ std::to_string(temp.start_time) + ","
+					+ std::to_string(temp.cpu_time);
 
-				outFile << data << std::endl;
-			}
+			outFile << data << std::endl;
+		}
 
 		outFile.close();
 		return SUCCESS;
-	}
-	else
-	{
+	} else {
 		return COULD_NOT_OPEN_FILE;
 	}
 
 }
 
-
-
-int sort(SORT_ORDER mySortOrder)
-{
-	switch(mySortOrder)
-		{
-		case SORT_ORDER::CPU_TIME:
-			return 1;
-		case SORT_ORDER::PROCESS_NUMBER:
-			return 2;
-		case SORT_ORDER::START_TIME:
-			return 3;
-		default:
-			return FAIL;
-		}
+int sort(SORT_ORDER mySortOrder) {
+	switch (mySortOrder) {
+	case SORT_ORDER::CPU_TIME:
+		return 1;
+	case SORT_ORDER::PROCESS_NUMBER:
+		return 2;
+	case SORT_ORDER::START_TIME:
+		return 3;
+	default:
+		return FAIL;
+	}
 }
 
 //sorts the vector, returns nothing (thats what void means)
@@ -130,8 +118,7 @@ void sortData(SORT_ORDER mySortOrder) {
 	sort(mySortOrder);
 }
 
-bool operator<(SORT_ORDER left, SORT_ORDER right)
-{
+bool operator<(SORT_ORDER left, SORT_ORDER right) {
 	return sort(left) < sort(right);
 }
 
