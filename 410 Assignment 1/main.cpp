@@ -32,7 +32,7 @@ bool EXPECT_EQ(T expectedVal, U actualVal, std::string testnumb = "") {
 void testLoadData() {
 
 	EXPECT_EQ(COULD_NOT_OPEN_FILE, loadData("testdataFAIL.txt"), "Test 1");
-	EXPECT_EQ(SUCCESS, saveData("testdata.txt"), "Test 2");
+	EXPECT_EQ(SUCCESS, loadData("testdata.txt"), "Test 2");
 
 }
 
@@ -43,11 +43,20 @@ void testSaveData() {
 
 
 void testSortData() {
-
+	sortData(SORT_ORDER);
 }
 
 void testGetFirst() {
+	process_stats tester;
+	tester.process_number = 1;
+	tester.start_time = 10;
+	tester.cpu_time = 51;
+	EXPECT_EQ(tester.process_number, getNext().process_number, "Test N");
 
+	tester.process_number = 2;
+	tester.start_time = 5;
+	tester.cpu_time = 4;
+	EXPECT_EQ(tester.cpu_time, getNext().cpu_time, "Test N.2");
 }
 
 int main() {

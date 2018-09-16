@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 std::vector<process_stats> list;
 
@@ -115,7 +116,7 @@ int sort(SORT_ORDER mySortOrder) {
 //sorts the vector, returns nothing (thats what void means)
 //sorts low to high
 void sortData(SORT_ORDER mySortOrder) {
-	sort(mySortOrder);
+	std::sort(list.begin(), list.end());
 }
 
 bool operator<(SORT_ORDER left, SORT_ORDER right) {
