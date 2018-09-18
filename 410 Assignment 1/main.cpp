@@ -43,7 +43,14 @@ void testSaveData() {
 
 
 void testSortData() {
-	sortData(SORT_ORDER);
+	sortData(CPU_TIME);
+	saveData("testDataSortedByCPUTime.txt");
+
+	sortData(START_TIME);
+	saveData("testDataSortedByStartTime.txt");
+
+	sortData(PROCESS_NUMBER);
+	saveData("testDataSortedByProcessNumber.txt");
 }
 
 void testGetFirst() {

@@ -2,7 +2,7 @@
  * utilities.cpp
  *
  *  Created on: Sep 6, 2018
- *      Author: matt
+ *      Author: Matt Passarelli
  */
 
 #include "utilities.h"
@@ -74,8 +74,6 @@ int loadData(const char* filename) {
 int saveData(const char* filename) {
 	std::ofstream outFile;
 
-	std::vector<process_stats>::iterator ptr;
-
 	outFile.open(filename);
 
 	if (outFile.is_open()) {
@@ -89,7 +87,14 @@ int saveData(const char* filename) {
 					+ std::to_string(temp.start_time) + ","
 					+ std::to_string(temp.cpu_time);
 
-			outFile << data << std::endl;
+			//I can't tell you how long it took me to figure out how to stop
+			//outputting a blank line at the end of all my files. I couldn't do it in 327
+			//but lo and behold, I figured out how to do it in class now lmoa
+
+			if (i < list.size() - 1)
+				outFile << data << std::endl;
+			else
+				outFile << data;
 		}
 
 		outFile.close();
@@ -100,27 +105,40 @@ int saveData(const char* filename) {
 
 }
 
-int sort(SORT_ORDER mySortOrder) {
-	switch (mySortOrder) {
-	case SORT_ORDER::CPU_TIME:
-		return 1;
-	case SORT_ORDER::PROCESS_NUMBER:
-		return 2;
-	case SORT_ORDER::START_TIME:
-		return 3;
-	default:
-		return FAIL;
-	}
+//Below are a set of sorting methods that I can use with std::sort
+//Another thing that took me a while to figure out how to do, and honestly
+//There's probably still a better way to do this, but this is how I figured I would sort
+//using an enum for the sorting parameter
+
+//Sorts by CPU_TIME
+bool compareByCPUTime(const process_stats &a, const process_stats b) {
+	return a.cpu_time < b.cpu_time;
+}
+
+//Sorts by PROCESS_NUMBER
+bool compareByProcessNumber(const process_stats &a, const process_stats b) {
+	return a.process_number < b.process_number;
+}
+
+//Sorts by START_TIME
+bool compareByStartTime(const process_stats &a, const process_stats b) {
+	return a.start_time < b.start_time;
 }
 
 //sorts the vector, returns nothing (thats what void means)
 //sorts low to high
 void sortData(SORT_ORDER mySortOrder) {
-	std::sort(list.begin(), list.end());
-}
-
-bool operator<(SORT_ORDER left, SORT_ORDER right) {
-	return sort(left) < sort(right);
+	switch (mySortOrder) {
+	case CPU_TIME:
+		std::sort(list.begin(), list.end(), compareByCPUTime);
+		break;
+	case PROCESS_NUMBER:
+		std::sort(list.begin(), list.end(), compareByProcessNumber);
+		break;
+	case START_TIME:
+		std::sort(list.begin(), list.end(), compareByStartTime);
+		break;
+	}
 }
 
 //return the first struct in the vector
